@@ -1,0 +1,54 @@
+{
+  "family": "paylab-api-gateway",
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "networkMode": "awsvpc",
+  "cpu": "256",
+  "memory": "512",
+  "runtimePlatform": {
+    "cpuArchitecture": "X86_64",
+    "operatingSystemFamily": "LINUX"
+  },
+  "executionRoleArn": "arn:aws:iam::<ACCOUNT_ID>:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::<ACCOUNT_ID>:role/paylabTaskRole",
+  "containerDefinitions": [
+    {
+      "name": "api-gateway",
+      "image": "<ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com/paylab/api-gateway:v1",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 8080,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        {
+          "name": "PORT",
+          "value": "8080"
+        },
+        {
+          "name": "WALLET_URL",
+          "value": "http://wallet-svc.paylab.internal:8082"
+        },
+        {
+          "name": "PAYMENT_URL",
+          "value": "http://payment-svc.paylab.internal:8081"
+        },
+        {
+          "name": "CORS_ORIGIN",
+          "value": "https://<WEB_HOST>"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/paylab",
+          "awslogs-region": "<REGION>",
+          "awslogs-stream-prefix": "api-gateway"
+        }
+      }
+    }
+  ]
+}
